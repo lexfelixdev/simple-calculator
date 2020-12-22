@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/calculationserver
+    url: jdbc:tc:mysql:8:///calculationserver
     username: calcserver
     password: calcserver
   jpa:

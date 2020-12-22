@@ -1,5 +1,7 @@
 package nl.lexfelix.simplecalculator.calculationserver.controller;
 
+import lombok.RequiredArgsConstructor;
+import nl.lexfelix.simplecalculator.calculationserver.controller.mapper.CalculationMapper;
 import nl.lexfelix.simplecalculator.calculationserver.repository.entity.Calculation;
 import nl.lexfelix.simplecalculator.calculationserver.controller.dto.CalculationDto;
 import nl.lexfelix.simplecalculator.calculationserver.service.CalculationService;
@@ -16,25 +18,23 @@ import java.util.List;
 @RestController
 @RequestMapping("/calculations")
 @CrossOrigin(origins = "http://localhost:4200", exposedHeaders = {"Location"})
+@RequiredArgsConstructor
 public class CalculationResource {
 
     private final CalculationService calculationService;
-
-    @Autowired
-    public CalculationResource(CalculationService calculationService) {
-        this.calculationService = calculationService;
-    }
+    private final CalculationMapper calculationMapper;
 
     @PostMapping
     public ResponseEntity<Void> addCalculation(@Valid @RequestBody CalculationDto calculationDto){
-        final var calculate = calculationService.calculate(new Calculation(calculationDto.getCalculationString()));
-        return ResponseEntity.created(URI.create("/calculations/" + calculate.getId())).build();
+        Calculation calculation = calculationMapper.toCalculation(calculationDto);
+        calculation = calculationService.calculate(calculation);
+        return ResponseEntity.created(URI.create("/calculations/" + calculation.getId())).build();
     }
 
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CalculationDto> getCalculation(@PathVariable Long id){
         final var calculation = calculationService.getCalculationById(id);
-        final var calculationDto = new CalculationDto(calculation.getId(), calculation.getCalculation(), calculation.getResult());
+        CalculationDto calculationDto = calculationMapper.toCalculationDto(calculation);
         return ResponseEntity.ok(calculationDto);
     }
 
@@ -43,7 +43,7 @@ public class CalculationResource {
         final var calculationList = calculationService.getAllCalculations();
         final List<CalculationDto> calculationDtoList = new ArrayList<>();
         for (Calculation calculation : calculationList){
-            calculationDtoList.add(new CalculationDto(calculation.getId(), calculation.getCalculation(), calculation.getResult()));
+            calculationDtoList.add(calculationMapper.toCalculationDto(calculation));
         }
         return ResponseEntity.ok(calculationDtoList);
     }

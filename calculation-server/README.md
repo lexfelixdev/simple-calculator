@@ -13,7 +13,6 @@ To run the server for development:
 mvn spring-boot:run
 ```
 
-To run the tests the mysql database needs to be running because of integration tests. Transactions with rollbacks are used to not make the tests persistent.
 To run the tests use:
 ```
 mvn test

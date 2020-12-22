@@ -1,8 +1,9 @@
 package nl.lexfelix.simplecalculator.calculationserver.service;
 
 import nl.lexfelix.simplecalculator.calculationserver.calc.SimpleCalculator;
-import nl.lexfelix.simplecalculator.calculationserver.repository.entity.Calculation;
 import nl.lexfelix.simplecalculator.calculationserver.repository.CalculationRepository;
+import nl.lexfelix.simplecalculator.calculationserver.repository.entity.Calculation;
+import nl.lexfelix.simplecalculator.calculationserver.repository.entity.OperatorType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,14 +70,14 @@ class CalculationServiceTest {
 
     private static Stream<TestCalculation> provideCorrectCalculationDtos(){
         return Stream.of(
-                new TestCalculation(new Calculation("1+2"), 3),
-                new TestCalculation(new Calculation("1+-2"), -1),
-                new TestCalculation(new Calculation("1-4"), -3),
-                new TestCalculation(new Calculation("-1-4"), -5),
-                new TestCalculation(new Calculation("1*4"), 4),
-                new TestCalculation(new Calculation("1*4/2"), 2),
-                new TestCalculation(new Calculation("1/4"), 0.25)
-
+                new TestCalculation(new Calculation(1, 2, OperatorType.ADD), 3),
+                new TestCalculation(new Calculation(1, -2, OperatorType.ADD), -1),
+                new TestCalculation(new Calculation(1, 4, OperatorType.SUBTRACT), -3),
+                new TestCalculation(new Calculation(-1, 4, OperatorType.SUBTRACT), -5),
+                new TestCalculation(new Calculation(1, 4, OperatorType.MULTIPLY), 4),
+                new TestCalculation(new Calculation(1, 4, OperatorType.DIVIDE), 0.25),
+                new TestCalculation(new Calculation(4, 0, OperatorType.DIVIDE), Double.POSITIVE_INFINITY),
+                new TestCalculation(new Calculation(-4, 0, OperatorType.DIVIDE), Double.NEGATIVE_INFINITY)
         );
     }
 
@@ -94,6 +96,23 @@ class CalculationServiceTest {
 
         assertThat(calculate.getResult()).isEqualTo(testCalculation.getResult());
         assertThat(calculationArgumentCaptor.getValue()).isEqualTo(calculate);
+    }
+
+    @Test
+    void calculateWithListShouldReturnCorrectResult(){
+        final var testCalculationStream = provideCorrectCalculationDtos();
+        final var testCalculationList = provideCorrectCalculationDtos().collect(Collectors.toList());
+        final var calculationList = testCalculationStream.map(TestCalculation::getCalculation).collect(Collectors.toList());
+
+        final var calculatedList = calculationService.calculate(calculationList);
+
+        verify(calculationRepository, times(testCalculationList.size())).save(calculationArgumentCaptor.capture());
+
+        assertThat(calculatedList).hasSameSizeAs(testCalculationList);
+
+        for (int i = 0; i < calculatedList.size(); i++) {
+            assertThat(calculatedList.get(i).getResult()).isEqualTo(testCalculationList.get(i).getResult());
+        }
     }
 
     @Test

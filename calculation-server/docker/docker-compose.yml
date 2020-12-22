@@ -1,11 +1,13 @@
-version: '3'
+version: '3.3'
+
 services:
-  calc-server-mysql:
+  db:
     image: mysql:8
-    environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=yes
-      - MYSQL_USER=calcserver
-      - MYSQL_PASSWORD=calcserver
-      - MYSQL_DATABASE=calculationserver
+    restart: always
     ports:
       - 3306:3306
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: calculationserver
+      MYSQL_USER: calcserver
+      MYSQL_PASSWORD: calcserver

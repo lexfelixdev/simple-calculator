@@ -2,22 +2,27 @@ package nl.lexfelix.simplecalculator.calculationserver.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.*;
-import nl.lexfelix.simplecalculator.calculationserver.repository.entity.Calculation;
+import nl.lexfelix.simplecalculator.calculationserver.repository.entity.OperatorType;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 @Data
 @AllArgsConstructor
-@RequiredArgsConstructor(onConstructor_ = @JsonCreator)
+@NoArgsConstructor
 public class CalculationDto {
 
-    private Long id;
-
     @NotNull
-    @Pattern(regexp = Calculation.CALCULATION_REGEX, message = "Must be a valid calculation")
-    private final String calculationString;
+    private Integer a;
+    @NotNull
+    private Integer b;
+    @NotNull
+    private OperatorType operator;
 
     private Double result;
 
+    public CalculationDto(@NotNull Integer a, @NotNull Integer b, @NotNull OperatorType operator) {
+        this.a = a;
+        this.b = b;
+        this.operator = operator;
+    }
 }

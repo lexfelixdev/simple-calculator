@@ -6,6 +6,7 @@ import nl.lexfelix.simplecalculator.calculationserver.CalculationServerApplicati
 import nl.lexfelix.simplecalculator.calculationserver.repository.entity.Calculation;
 import nl.lexfelix.simplecalculator.calculationserver.controller.dto.CalculationDto;
 import nl.lexfelix.simplecalculator.calculationserver.repository.CalculationRepository;
+import nl.lexfelix.simplecalculator.calculationserver.repository.entity.OperatorType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -16,6 +17,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import javax.transaction.Transactional;
 import java.util.stream.Stream;
@@ -28,7 +33,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CalculationServerApplication.class)
 @AutoConfigureMockMvc
 @Transactional
+@Testcontainers
 class CalculationResourceTest {
+
+    @Container
+    private final static MySQLContainer MYSQL_CONTAINER = new MySQLContainer(DockerImageName.parse("mysql:8"));
 
     public static final long VALID_ID = 1L;
     public static final String ADD_CALCULATION_PATH = "/calculations";
@@ -48,27 +57,19 @@ class CalculationResourceTest {
 
     private static Stream<CalculationDto> provideCorrectCalculationDtos(){
         return Stream.of(
-                new CalculationDto("1+2"),
-                new CalculationDto("1+-2"),
-                new CalculationDto("1-4"),
-                new CalculationDto("-1-4"),
-                new CalculationDto("1*4"),
-                new CalculationDto("1*4/2"),
-                new CalculationDto("1/4"),
-                new CalculationDto("1+2+3"),
-                new CalculationDto("11+11")
+                new CalculationDto(1,3, OperatorType.ADD),
+                new CalculationDto(10,-20,OperatorType.SUBTRACT),
+                new CalculationDto(-1,4, OperatorType.SUBTRACT),
+                new CalculationDto(1,4, OperatorType.MULTIPLY),
+                new CalculationDto(1,4, OperatorType.DIVIDE)
         );
     }
     private static Stream<CalculationDto> provideIncorrectCalculationDtos(){
         return Stream.of(
-                new CalculationDto("1++2"),
-                new CalculationDto("01-4"),
-                new CalculationDto("1*04"),
-                new CalculationDto("1+2+3+4+5+6+7+9+00"),
-                new CalculationDto(""),
-                new CalculationDto("klajnsdf"),
-                new CalculationDto("1+2+dfdf")
-
+                new CalculationDto(null,null,null),
+                new CalculationDto(1,null,null),
+                new CalculationDto(null,2,null),
+                new CalculationDto(null,null,OperatorType.ADD)
         );
     }
 
