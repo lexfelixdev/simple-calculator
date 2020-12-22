@@ -18,7 +18,7 @@ To run the tests use:
 mvn test
 ```
 
-To build deployable jar (When packaging tests are run, so make sure the mysql server is running): 
+To build deployable jar:
 ```
 mvn package
 ```
