@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.NoSuchElementException;
@@ -17,8 +18,9 @@ public class WebMvcExceptionHandlingConfig extends ResponseEntityExceptionHandle
     public void handleNoSuchElementExceptionConflict(){
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({ArithmeticException.class})
-    public void handleArithmeticExceptionConflict(){
+    protected ResponseEntity<Object>  handleArithmeticExceptionConflict(ArithmeticException ex){
+        return ResponseEntity.badRequest().body("One of the calculations you provided is not valid because: " +ex.getMessage());
     }
+
 }

@@ -22,6 +22,10 @@ export class CalculationService {
           this.calculationSubject.next(calculation);
         })
         resetFnc();
+    },
+    error => {
+      console.log("error");
+      alert(error.error);
     })
   }
 

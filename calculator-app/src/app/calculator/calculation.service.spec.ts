@@ -70,6 +70,19 @@ describe('CalculationService', () => {
     });
   });
 
+  it('calculateList should display alert on error', ()=>{
+    spyOn(window, 'alert');
+    const dummyError = {status: 400, statusText: 'Bad Request'};
+    let resetIsCalled = false;
+    service.calculateList(calculations, () => {resetIsCalled = true;});
+
+    const req = httpMock.expectOne(environment.serverUrl + ADD_ENDPOINT_PATH);
+    req.flush('test error message', dummyError);
+
+    expect(resetIsCalled).not.toBeTrue();
+    expect(window.alert).toHaveBeenCalledWith('test error message');
+  });
+
   it('calculateList should call reset function', ()=>{
     let resetIsCalled = false;
     service.calculateList(calculations, () => {resetIsCalled = true;});

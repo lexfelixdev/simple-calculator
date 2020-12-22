@@ -10,6 +10,7 @@ import { VALID_OPERATORS } from '../calculation.constants';
   styleUrls: ['./simple-calculator.component.scss'],
 })
 export class SimpleCalculatorComponent implements OnInit {
+  validNumberRegex = '^-?[0-9]*$';
   calculatorForm: FormArray;
   validOperators = VALID_OPERATORS;
 
@@ -26,9 +27,9 @@ export class SimpleCalculatorComponent implements OnInit {
     console.log('Add new calculation field');
     this.calculatorForm.push(
       this.formBuilder.group({
-        leftHand: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+        leftHand: ['', [Validators.required, Validators.pattern(this.validNumberRegex)]],
         operator: ['', Validators.required],
-        rightHand: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+        rightHand: ['', [Validators.required, Validators.pattern(this.validNumberRegex)]],
       })
     );
   }
@@ -36,9 +37,9 @@ export class SimpleCalculatorComponent implements OnInit {
   getInitialForm(): FormArray {
     return this.formBuilder.array([
       this.formBuilder.group({
-        leftHand: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+        leftHand: ['', [Validators.required, Validators.pattern(this.validNumberRegex)]],
         operator: ['', Validators.required],
-        rightHand: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+        rightHand: ['', [Validators.required, Validators.pattern(this.validNumberRegex)]],
       }),
     ]);
   }
