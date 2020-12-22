@@ -1,0 +1,6 @@
+<h1>Simple Calculator</h1>
+<app-simple-calculator-history></app-simple-calculator-history>
+<form class="calculator" [formGroup]="calculatorForm" (submit)="sendCalculation()">
+  <input type="text" name="calculation" formControlName="calculation">
+  <button class="button" type="submit" [disabled]="!calculatorForm.valid">=</button>
+</form>
