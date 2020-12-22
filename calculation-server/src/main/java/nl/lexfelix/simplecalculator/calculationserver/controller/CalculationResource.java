@@ -25,10 +25,10 @@ public class CalculationResource {
     private final CalculationMapper calculationMapper;
 
     @PostMapping
-    public ResponseEntity<Void> addCalculation(@Valid @RequestBody CalculationDto calculationDto){
-        Calculation calculation = calculationMapper.toCalculation(calculationDto);
+    public ResponseEntity<List<CalculationDto>> addCalculations(@Valid @RequestBody List<CalculationDto> calculationDto){
+        List<Calculation> calculation = calculationMapper.toCalculation(calculationDto);
         calculation = calculationService.calculate(calculation);
-        return ResponseEntity.created(URI.create("/calculations/" + calculation.getId())).build();
+        return ResponseEntity.ok(calculationMapper.toCalculationDto(calculation));
     }
 
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)

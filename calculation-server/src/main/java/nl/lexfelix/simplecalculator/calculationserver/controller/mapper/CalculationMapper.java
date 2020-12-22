@@ -5,10 +5,16 @@ import nl.lexfelix.simplecalculator.calculationserver.repository.entity.Calculat
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface CalculationMapper {
 
+    List<CalculationDto> toCalculationDto(List<Calculation> calculation);
     CalculationDto toCalculationDto(Calculation calculation);
+
+
+    List<Calculation> toCalculation(List<CalculationDto> calculation);
 
     @Mapping(target ="id", ignore = true)
     Calculation toCalculation(CalculationDto calculation);

@@ -1,15 +1,32 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 
 import { CalculationService } from './calculation.service';
+import { Calculation } from './calculation.model';
+import { environment } from './../../environments/environment';
 
 describe('CalculationService', () => {
   let service: CalculationService;
   let httpMock: HttpTestingController;
+  const ADD_ENDPOINT_PATH = '/calculations';
+
+  const dummyResponse = [
+    new Calculation(1, 1, 2, 'ADD', 3),
+    new Calculation(2, 4, 5, 'SUBTRACT', -1),
+    new Calculation(3, 0, 1, 'DIVIDE', 0),
+  ];
+  const calculations = [
+    new Calculation(null, 1, 2, 'ADD', null),
+    new Calculation(null, 4, 5, 'SUBTRACT', null),
+    new Calculation(null, 0, 1, 'DIVIDE', null),
+  ];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     service = TestBed.inject(CalculationService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -23,16 +40,73 @@ describe('CalculationService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('getCalculationResult should set Subject ', () => {
-    const mockCalculation = [
-      {id: 1, calculationString: "1+1", result: 2.0}
-    ]
+  it('calculateList should call backend function', () => {
+    service.calculateList(calculations, () => {});
 
-    service.getCalculationResult("/calculations/1");
+    const req = httpMock.expectOne(environment.serverUrl + ADD_ENDPOINT_PATH);
+    expect(req.request.method).toBe('POST');
+    req.flush(dummyResponse);
+  });
 
-    const req = httpMock.expectOne('http://localhost:8080/calculations/1');
-    expect(req.request.method).toBe("GET");
+  it('calculateList should call set all new calculations in subject', () => {
+    let responseCalculations: Calculation[] = [];
 
-    req.flush(mockCalculation);
-  })
+    service.getCalculationSubject().subscribe((calculation) => {
+      responseCalculations.push(calculation);
+    });
+
+    service.calculateList(calculations, () => {});
+
+    const req = httpMock.expectOne(environment.serverUrl + ADD_ENDPOINT_PATH);
+    req.flush(dummyResponse);
+
+    expect(responseCalculations.length).toBe(3);
+    responseCalculations.forEach((calculation, index) =>{
+        const exceptedCalculation = calculations[index];
+        expect(calculation.a).toBe(exceptedCalculation.a);
+        expect(calculation.b).toBe(exceptedCalculation.b);
+        expect(calculation.operator).toBe(exceptedCalculation.operator);
+        expect(calculation.result).not.toBeNull();
+    });
+  });
+
+  it('calculateList should call reset function', ()=>{
+    let resetIsCalled = false;
+    service.calculateList(calculations, () => {resetIsCalled = true;});
+
+    const req = httpMock.expectOne(environment.serverUrl + ADD_ENDPOINT_PATH);
+    req.flush(dummyResponse);
+    expect(resetIsCalled).toBeTrue();
+  });
+
+  it('getAllCalculationResults should call the backend', () =>{
+    service.getAllCalculationResults();
+
+    const req = httpMock.expectOne(environment.serverUrl + ADD_ENDPOINT_PATH);
+    expect(req.request.method).toBe('GET');
+    req.flush(dummyResponse);
+  });
+
+  it('getAllCalculationResults should set all calculations in subject', () =>{
+    let responseCalculations: Calculation[] = [];
+
+    service.getCalculationSubject().subscribe((calculation) => {
+      responseCalculations.push(calculation);
+    });
+
+    service.getAllCalculationResults();
+
+    const req = httpMock.expectOne(environment.serverUrl + ADD_ENDPOINT_PATH);
+    req.flush(dummyResponse);
+
+    expect(responseCalculations.length).toBe(3);
+    responseCalculations.forEach((calculation, index) =>{
+        const exceptedCalculation = calculations[index];
+        expect(calculation.a).toBe(exceptedCalculation.a);
+        expect(calculation.b).toBe(exceptedCalculation.b);
+        expect(calculation.operator).toBe(exceptedCalculation.operator);
+        expect(calculation.result).not.toBeNull();
+    });
+  });
+
 });

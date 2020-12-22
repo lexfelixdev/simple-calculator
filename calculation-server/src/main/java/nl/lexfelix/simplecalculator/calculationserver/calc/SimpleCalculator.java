@@ -18,13 +18,16 @@ public class SimpleCalculator {
     }
 
     /**
-     * Integers are given but because a double is returned
-     * The IEEE 754 arithemtic specification is used (https://docs.oracle.com/javase/specs/jls/se11/html/jls-15.html#jls-15.17.2)
+     * Although Double has support for Infinity Values the database can't store them so it throws ArithmeticException
      * @param numerator Numerator
      * @param denominator Denominator
-     * @return Value of the division according to IEEE 754
+     * @return Value of the division
      */
     public double divide(int numerator, int denominator) {
-        return (double) numerator / (double)denominator ;
+        final var result = (double) numerator / (double) denominator;
+        if(!Double.isFinite(result)){
+            throw new ArithmeticException("Division by Zero is not supported");
+        }
+        return result;
     }
 }

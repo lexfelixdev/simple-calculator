@@ -58,9 +58,7 @@ class SimpleCalculatorTest {
                 new SimpleTestCalculation(0,2,0),
                 new SimpleTestCalculation(-7,-2, 3.5),
                 new SimpleTestCalculation(-7,2,-3.5),
-                new SimpleTestCalculation(7, -2, -3.5),
-                new SimpleTestCalculation(1, 0, Double.POSITIVE_INFINITY),
-                new SimpleTestCalculation(-1, 0, Double.NEGATIVE_INFINITY)
+                new SimpleTestCalculation(7, -2, -3.5)
         );
     }
 
@@ -128,6 +126,18 @@ class SimpleCalculatorTest {
     void multiplyingShouldThrowArithemticExceptionWhenIntegerUnderflows(){
         assertThatThrownBy(() -> {
             simpleCalculator.multiply(Integer.MIN_VALUE, 2);
+        }).isInstanceOf(ArithmeticException.class);
+    }
+    @Test
+    void dividingShouldThrowArithemticExceptionWhenDivisorIsZero(){
+        assertThatThrownBy(() -> {
+            simpleCalculator.divide(1, 0);
+        }).isInstanceOf(ArithmeticException.class);
+    }
+    @Test
+    void dividingShouldThrowArithemticExceptionWhenDivisorIsZeroAndNumeratorIsNegative(){
+        assertThatThrownBy(() -> {
+            simpleCalculator.divide(-1, 0);
         }).isInstanceOf(ArithmeticException.class);
     }
 

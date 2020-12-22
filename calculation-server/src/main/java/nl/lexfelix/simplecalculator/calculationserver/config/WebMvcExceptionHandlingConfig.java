@@ -14,7 +14,11 @@ public class WebMvcExceptionHandlingConfig extends ResponseEntityExceptionHandle
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({NoSuchElementException.class})
-    public void handleConflict(){
+    public void handleNoSuchElementExceptionConflict(){
+    }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({ArithmeticException.class})
+    public void handleArithmeticExceptionConflict(){
     }
 }

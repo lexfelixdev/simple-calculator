@@ -1,11 +1,15 @@
 export class Calculation {
-  id: number;
-  calculationString: string;
+  id:number;
+  a: number;
+  b: number;
+  operator: string;
   result: number;
 
-  constructor(id:number, calculationString: string, result: number) {
+  constructor(id:number, a:number,b:number, operator: string, result: number) {
     this.id = id;
-    this.calculationString = calculationString;
+    this.a = a;
+    this.b = b;
+    this.operator = operator;
     this.result = result;
   }
 }
